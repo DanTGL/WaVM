@@ -19,6 +19,7 @@ public class CommonProxy {
 	}
 	
 	public void init(FMLInitializationEvent e) {
+		WVRecipes.init();
 		WerewolfCapability.register();
 	}
 	
