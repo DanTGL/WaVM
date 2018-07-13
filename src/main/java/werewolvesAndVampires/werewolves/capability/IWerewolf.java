@@ -10,9 +10,9 @@ public interface IWerewolf {
 	
 	public void setIsTransformed(boolean is);
 	
-	public ControlLevel getControlLevel();
+	public int getBloodLust();
 	
-	public void setControlLevel(ControlLevel level);
+	public void setBloodLust(int time);
 	
 	public int getTransformCount();
 	

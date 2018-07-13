@@ -12,7 +12,7 @@ public class WerewolfCapability implements IWerewolf {
 
 	private boolean isTransformed = false;
 
-	private ControlLevel controlLevel = ControlLevel.ALL;
+	private int bloodLust = -1;
 
 	private int transformCount = 0;
 
@@ -29,13 +29,13 @@ public class WerewolfCapability implements IWerewolf {
 	}
 
 	@Override
-	public ControlLevel getControlLevel() {
-		return controlLevel;
+	public int getBloodLust() {
+		return bloodLust;
 	}
 
 	@Override
-	public void setControlLevel(ControlLevel level) {
-		controlLevel = level;
+	public void setBloodLust(int time) {
+		bloodLust = time;
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public class WerewolfCapability implements IWerewolf {
 			NBTTagCompound nbt = new NBTTagCompound();
 			nbt.setInteger("werewolftype", instance.getWerewolfType().id);
 			nbt.setBoolean("transformed", instance.getIsTransformed());
-			nbt.setInteger("controlLevel", instance.getControlLevel().id);
+			nbt.setInteger("bloodLust", instance.getBloodLust());
 			nbt.setInteger("transformcount", instance.getTransformCount());
 			return nbt;
 		}
@@ -81,7 +81,7 @@ public class WerewolfCapability implements IWerewolf {
 				NBTTagCompound nbtc = (NBTTagCompound) nbt;
 				instance.setWerewolfType(WerewolfType.getEnumFromId(nbtc.getInteger("werewolftype")));
 				instance.setIsTransformed(nbtc.getBoolean("transformed"));
-				instance.setControlLevel(ControlLevel.getEnumFromId(nbtc.getInteger("controlLevel")));
+				instance.setBloodLust(nbtc.getInteger("bloodLust"));
 				instance.setTransformCount(nbtc.getInteger("transformcount"));
 			}
 		}
