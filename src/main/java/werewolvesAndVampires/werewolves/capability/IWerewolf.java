@@ -19,4 +19,8 @@ public interface IWerewolf {
 	public void incrementTransformCount();
 	
 	public void setTransformCount(int count);
+	
+	public void setEntity(int id);
+	
+	public int getEntity();
 }

@@ -26,6 +26,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import werewolvesAndVampires.packets.PacketRegister;
+import werewolvesAndVampires.packets.SyncWerewolfCap;
 import werewolvesAndVampires.werewolves.WerewolfHelpers;
 import werewolvesAndVampires.werewolves.capability.IWerewolf;
 import werewolvesAndVampires.werewolves.capability.WerewolfProvider;
@@ -80,33 +82,35 @@ public class WerewolfEntity extends EntityVillager {
 				(float) this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue());
 
 		if (attacked) {
-			
-			((EntityLivingBase)entityIn).knockBack(this, 0.5F, (double)MathHelper.sin(this.rotationYaw * 0.017453292F), (double)(-MathHelper.cos(this.rotationYaw * 0.017453292F)));
-            this.motionX *= 0.6D;
-            this.motionZ *= 0.6D;
-			
-            if (entityIn instanceof EntityPlayer)
-            {
-                EntityPlayer entityplayer = (EntityPlayer)entityIn;
-                ItemStack itemstack = this.getHeldItemMainhand();
-                ItemStack itemstack1 = entityplayer.isHandActive() ? entityplayer.getActiveItemStack() : ItemStack.EMPTY;
 
-                if (!itemstack.isEmpty() && !itemstack1.isEmpty() && itemstack.getItem() instanceof ItemAxe && itemstack1.getItem() == Items.SHIELD)
-                {
-                    float f1 = 0.25F + (float)EnchantmentHelper.getEfficiencyModifier(this) * 0.05F;
+			((EntityLivingBase) entityIn).knockBack(this, 0.5F,
+					(double) MathHelper.sin(this.rotationYaw * 0.017453292F),
+					(double) (-MathHelper.cos(this.rotationYaw * 0.017453292F)));
+			this.motionX *= 0.6D;
+			this.motionZ *= 0.6D;
 
-                    if (this.rand.nextFloat() < f1)
-                    {
-                        entityplayer.getCooldownTracker().setCooldown(Items.SHIELD, 100);
-                        this.world.setEntityState(entityplayer, (byte)30);
-                    }
-                }
-            }
-            
+			if (entityIn instanceof EntityPlayer) {
+				EntityPlayer entityplayer = (EntityPlayer) entityIn;
+				ItemStack itemstack = this.getHeldItemMainhand();
+				ItemStack itemstack1 = entityplayer.isHandActive() ? entityplayer.getActiveItemStack()
+						: ItemStack.EMPTY;
+
+				if (!itemstack.isEmpty() && !itemstack1.isEmpty() && itemstack.getItem() instanceof ItemAxe
+						&& itemstack1.getItem() == Items.SHIELD) {
+					float f1 = 0.25F + (float) EnchantmentHelper.getEfficiencyModifier(this) * 0.05F;
+
+					if (this.rand.nextFloat() < f1) {
+						entityplayer.getCooldownTracker().setCooldown(Items.SHIELD, 100);
+						this.world.setEntityState(entityplayer, (byte) 30);
+					}
+				}
+			}
+
 			IWerewolf were = entityIn.getCapability(WerewolfProvider.WEREWOLF_CAP, null);
 			if (entityIn instanceof EntityLivingBase && were != null && were.getWerewolfType() != WerewolfType.FULL
 					&& this.getCapability(WerewolfProvider.WEREWOLF_CAP, null).getIsTransformed()) {
 				were.setWerewolfType(WerewolfType.INFECTED);
+				PacketRegister.INSTANCE.sendToDimension(new SyncWerewolfCap(were, entityIn), entityIn.dimension);
 				return true;
 			} else {
 				return false;
@@ -118,7 +122,7 @@ public class WerewolfEntity extends EntityVillager {
 	@Override
 	public void onLivingUpdate() {
 		super.onLivingUpdate();
-		if (this.isServerWorld() && !this.world.isDaytime() && this.world.getCurrentMoonPhaseFactor() == 1F) {
+		if (!this.world.isRemote && !this.world.isDaytime() && this.world.getCurrentMoonPhaseFactor() == 1F) {
 			IWerewolf were = this.getCapability(WerewolfProvider.WEREWOLF_CAP, null);
 			if (!were.getIsTransformed()
 					&& this.world.canBlockSeeSky(new BlockPos(this.posX, this.posY + 1, this.posZ))) {
@@ -130,8 +134,6 @@ public class WerewolfEntity extends EntityVillager {
 				WerewolfHelpers.transformEntity(this, were, false);
 		}
 	}
-	
-	
 
 	public class FindTargetWhenTransformed extends EntityAINearestAttackableTarget {
 
@@ -147,13 +149,39 @@ public class WerewolfEntity extends EntityVillager {
 			}
 			return false;
 		}
-		
+
 		@Override
 		protected boolean isSuitableTarget(EntityLivingBase target, boolean includeInvincibles) {
-			if(target instanceof WerewolfEntity)
+			if (target instanceof WerewolfEntity)
 				return false;
 			return super.isSuitableTarget(target, includeInvincibles);
 		}
 
+	}
+
+	public class AttackWhenTransformed extends EntityAIAttackMelee {
+
+		public AttackWhenTransformed(EntityCreature creature, double speedIn, boolean useLongMemory) {
+			super(creature, speedIn, useLongMemory);
+		}
+		
+		@Override
+		public boolean shouldExecute() {
+			if (this.attacker.getCapability(WerewolfProvider.WEREWOLF_CAP, null) != null
+					&& this.attacker.getCapability(WerewolfProvider.WEREWOLF_CAP, null).getIsTransformed()) {
+				return super.shouldExecute();
+			}
+			return false;
+		}
+		
+		@Override
+		public boolean shouldContinueExecuting() {
+			if (this.attacker.getCapability(WerewolfProvider.WEREWOLF_CAP, null) != null
+					&& this.attacker.getCapability(WerewolfProvider.WEREWOLF_CAP, null).getIsTransformed()) {
+				return super.shouldContinueExecuting();
+			}
+			return false;
+		}
+		
 	}
 }

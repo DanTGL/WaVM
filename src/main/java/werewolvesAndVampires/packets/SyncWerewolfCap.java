@@ -24,7 +24,7 @@ public class SyncWerewolfCap implements IMessage {
 	
 	public SyncWerewolfCap(IWerewolf w, Entity e) {
 		isTransformed = w.getIsTransformed();
-		werewolfType = w.getWerewolfType().id;
+		werewolfType = w.getWerewolfType().ordinal();
 		bloodLust = w.getBloodLust();
 		transformCount = w.getTransformCount();
 		id = e.getEntityId();
@@ -59,7 +59,7 @@ public class SyncWerewolfCap implements IMessage {
 		private void handle(SyncWerewolfCap message, MessageContext ctx) {
 			if(Minecraft.getMinecraft().world.getEntityByID(message.id) == null)return;
 			IWerewolf were = Minecraft.getMinecraft().world.getEntityByID(message.id).getCapability(WerewolfProvider.WEREWOLF_CAP, null);
-			were.setWerewolfType(WerewolfType.getEnumFromId(message.werewolfType));
+			were.setWerewolfType(WerewolfType.byOrdinal(message.werewolfType));
 			were.setIsTransformed(message.isTransformed);
 			were.setBloodLust(message.bloodLust);
 			were.setTransformCount(message.transformCount);

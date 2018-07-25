@@ -1,0 +1,6 @@
+{
+    "parent": "weresandvamps:block/wolfsbane_dust/side_alt",
+    "textures": {
+        "line": "blocks/redstone_dust_line0"
+    }
+}

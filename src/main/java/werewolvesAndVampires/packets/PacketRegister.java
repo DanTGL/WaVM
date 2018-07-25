@@ -20,6 +20,6 @@ public class PacketRegister {
     public static void regMessages(String channelName) {
         INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(channelName);
         INSTANCE.registerMessage(SyncWerewolfCap.Handler.class, SyncWerewolfCap.class, nextID(), Side.CLIENT);
-        
+        INSTANCE.registerMessage(WerewolfCameraUpdate.Handler.class, WerewolfCameraUpdate.class, nextID(), Side.CLIENT);
     }
 }

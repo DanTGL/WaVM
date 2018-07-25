@@ -1,0 +1,6 @@
+{
+    "parent": "block/crop",
+    "textures": {
+        "crop": "weresandvamps:blocks/garlic_crop/stage_0"
+    }
+}

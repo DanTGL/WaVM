@@ -2,6 +2,7 @@ package werewolvesAndVampires.core;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraft.world.World;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -26,15 +27,20 @@ public class CommonProxy {
 	public void postInit(FMLPostInitializationEvent e) {
 		
 	}
-	
+
+	public World getWorld() {
+		return null;
+	}
+
 	@SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event) {
-	WVItems.regItems(event);
-	WVBlocks.regItemBlocks(event);
+		WVItems.regItems(event);
+		WVBlocks.regItemBlocks(event);
     }
 
     @SubscribeEvent
     public static void registerBlocks(RegistryEvent.Register<Block> event) {
 	WVBlocks.regBlocks(event);
     }
+
 }
